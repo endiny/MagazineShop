@@ -1,0 +1,12 @@
+apply plugin: 'java'
+
+sourceCompatibility = 8
+targetCompatibility = 8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile "org.postgresql:postgresql:9.4.1208.jre7"
+}
