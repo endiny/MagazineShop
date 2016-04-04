@@ -9,4 +9,8 @@ repositories {
 
 dependencies {
     compile "org.postgresql:postgresql:9.4.1208.jre7"
+    compile 'org.apache.logging.log4j:log4j-api:2.+'
+    compile 'org.apache.logging.log4j:log4j-core:2.+'
+    compile 'javax:javaee-api:7.0'
+    testCompile 'junit:junit:4.+'
 }
