@@ -1,4 +1,4 @@
-package com.epam.jc.dbcontroller.connectionpool;
+package com.epam.jc.dbcontroller.ConnectionPool;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

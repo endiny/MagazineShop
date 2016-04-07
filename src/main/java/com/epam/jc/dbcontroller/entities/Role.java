@@ -1,4 +1,4 @@
-package com.epam.jc.dbcontroller.entities;
+package com.epam.jc.dbcontroller.Entities;
 
 /**
  * Created on 07.04.16.

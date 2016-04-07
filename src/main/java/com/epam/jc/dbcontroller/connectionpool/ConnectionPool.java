@@ -1,4 +1,4 @@
-package com.epam.jc.dbcontroller.connectionpool;
+package com.epam.jc.dbcontroller.ConnectionPool;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -9,6 +9,13 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 public class ConnectionPool {
+    public BlockingQueue<Connection> getFreeConnections() {
+        return freeConnections;
+    }
+
+    public BlockingQueue<Connection> getReservedConnections() {
+        return reservedConnections;
+    }
 
     private BlockingQueue<Connection> freeConnections;
     private BlockingQueue<Connection> reservedConnections;
@@ -43,7 +50,7 @@ public class ConnectionPool {
         initPoolData();
     }
 
-    public void initPoolData() {
+    private void initPoolData() {
         Locale.setDefault(Locale.ENGLISH);
 
         try {

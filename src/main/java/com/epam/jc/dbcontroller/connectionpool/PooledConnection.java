@@ -1,4 +1,4 @@
-package com.epam.jc.dbcontroller.connectionpool;
+package com.epam.jc.dbcontroller.ConnectionPool;
 
 import java.sql.Connection;
 import java.sql.SQLException;

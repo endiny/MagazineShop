@@ -1,6 +1,6 @@
-package com.epam.jc.dbcontroller.entities;
+package com.epam.jc.dbcontroller.Entities;
 
-import java.util.Date;
+import java.sql.Date;
 
 /**
  * Created on 07.04.16.
@@ -20,7 +20,7 @@ public class Subscription {
         this.months = months;
     }
 
-    public Long getMagazine_Id() {
+    public Long getMagazineId() {
         return magazine_Id;
     }
 

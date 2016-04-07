@@ -1,7 +1,6 @@
-package com.epam.jc.dbcontroller.entities;
+package com.epam.jc.dbcontroller.Entities;
 
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.sql.Timestamp;
 
 /**
  * Created on 07.04.16.
@@ -12,24 +11,34 @@ public class Order {
     private Long id;
 
     private Long userId;
-    private LocalDateTime orderTime;
+    private Timestamp orderTime;
     private Double toPay;
-    private Double paid;
+    private Boolean paid;
     private String shipAddress;
-    public LocalDateTime getOrderTime() {
-        return orderTime;
-    }
 
-    public Order(Long id, Long userId, Long orderTime, Double toPay, Double paid, String shipAddress) {
+    public Order(Long id, Long userId, Timestamp orderTime, Double toPay, Boolean paid, String shipAddress) {
         this.id = id;
         this.userId = userId;
-        this.orderTime = LocalDateTime.ofEpochSecond(orderTime, 0, ZoneOffset.UTC);
+        this.orderTime = orderTime;
         this.toPay = toPay;
         this.paid = paid;
         this.shipAddress = shipAddress;
     }
 
-    public void setOrderTime(LocalDateTime orderTime) {
+    public Timestamp getOrderTime() {
+        return orderTime;
+    }
+
+    public Order(Long id, Long userId, Long orderTime, Double toPay, Boolean paid, String shipAddress) {
+        this.id = id;
+        this.userId = userId;
+        this.orderTime = new Timestamp(orderTime);
+        this.toPay = toPay;
+        this.paid = paid;
+        this.shipAddress = shipAddress;
+    }
+
+    public void setOrderTime(Timestamp orderTime) {
         this.orderTime = orderTime;
     }
 
@@ -50,11 +59,11 @@ public class Order {
         this.toPay = toPay;
     }
 
-    public Double getPaid() {
+    public Boolean isPaid() {
         return paid;
     }
 
-    public void setPaid(Double paid) {
+    public void setPaid(Boolean paid) {
         this.paid = paid;
     }
 
