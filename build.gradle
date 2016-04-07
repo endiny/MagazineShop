@@ -1,4 +1,5 @@
 apply plugin: 'java'
+apply plugin: 'war'
 
 sourceCompatibility = 8
 targetCompatibility = 8
@@ -11,6 +12,11 @@ dependencies {
     compile "org.postgresql:postgresql:9.4.1208.jre7"
     compile 'org.apache.logging.log4j:log4j-api:2.+'
     compile 'org.apache.logging.log4j:log4j-core:2.+'
-    compile 'javax:javaee-api:7.0'
+//    compile 'javax:javaee-api:7.0'
+    compile 'com.sun.jersey:jersey-server:1.13'
+    compile 'com.sun.jersey:jersey-core:1.13'
+    compile 'com.sun.jersey:jersey-servlet:1.13'
     testCompile 'junit:junit:4.+'
 }
+
+version = "1.0-SNAPSHOT"

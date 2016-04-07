@@ -32,4 +32,4 @@ proguard/
 .gradletasknamecache
 .gradle/
 build/
-bin/
+classes
