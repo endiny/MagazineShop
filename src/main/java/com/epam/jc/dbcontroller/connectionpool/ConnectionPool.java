@@ -1,4 +1,4 @@
-package com.epam.jc.dbcontroller.ConnectionPool;
+package com.epam.jc.DbController.ConnectionPool;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -36,7 +36,7 @@ public class ConnectionPool {
     private ConnectionPool() {
         Properties properties = new Properties();
         try {
-            properties.load(new FileInputStream("src/main/resources/db.properties"));
+            properties.load(new FileInputStream("/Users/endiny/workspace/MagazineServer/src/main/resources/db.properties"));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

@@ -1,4 +1,4 @@
-package com.epam.jc.dbcontroller.Entities;
+package com.epam.jc.DbController.Entities;
 
 /**
  * Created on 07.04.16.
@@ -7,6 +7,15 @@ package com.epam.jc.dbcontroller.Entities;
  */
 public class Role {
     private Long id;
+
+    @Override
+    public String toString() {
+        return "Role{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                '}';
+    }
+
     private String name;
 
     public Role(Long id, String name) {

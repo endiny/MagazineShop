@@ -1,8 +1,8 @@
-package com.epam.jc.dbcontroller.DAO;
+package com.epam.jc.DbController.DAO;
 
-import com.epam.jc.dbcontroller.ConnectionPool.ConnectionPool;
-import com.epam.jc.dbcontroller.ConnectionPool.PooledConnection;
-import com.epam.jc.dbcontroller.Entities.Magazine;
+import com.epam.jc.DbController.ConnectionPool.ConnectionPool;
+import com.epam.jc.DbController.ConnectionPool.PooledConnection;
+import com.epam.jc.DbController.Entities.Magazine;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -68,12 +68,16 @@ public class MagazineDAO {
             PreparedStatement st = conn.prepareStatement(sql);
             st.setLong(1, id);
             ResultSet result = st.executeQuery();
+            if (!result.next()) {
+                throw new SQLException("No magazine with id #" + id + " is available.");
+            }
             return new Magazine(result.getLong("id"),
                     result.getString("name"),
                     result.getDouble("price"),
                     result.getString("description"));
         }
         catch (SQLException e) {
+            e.printStackTrace();
             return new Magazine(0L, "", 0.0, "");
         }
     }

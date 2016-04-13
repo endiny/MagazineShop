@@ -1,4 +1,4 @@
-package com.epam.jc.dbcontroller.Entities;
+package com.epam.jc.DbController.Entities;
 
 /**
  * Created on 07.04.16.
@@ -10,6 +10,14 @@ package com.epam.jc.dbcontroller.Entities;
 public class User {
     private Long id;
     private String login;
+
+    public User(String login, String name, String passwd, Long role) {
+        this.login = login;
+        this.name = name;
+        this.passwd = passwd;
+        this.role = role;
+    }
+
     private String name;
     private String passwd;
 

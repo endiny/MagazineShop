@@ -1,4 +1,4 @@
-package com.epam.jc.dbcontroller.Entities;
+package com.epam.jc.DbController.Entities;
 
 import java.sql.Timestamp;
 
@@ -73,5 +73,17 @@ public class Order {
 
     public void setShipAddress(String shipAddress) {
         this.shipAddress = shipAddress;
+    }
+
+    @Override
+    public String toString() {
+        return "Order{" +
+                "id=" + id +
+                ", userId=" + userId +
+                ", orderTime=" + orderTime +
+                ", toPay=" + toPay +
+                ", paid=" + paid +
+                ", shipAddress='" + shipAddress + '\'' +
+                '}';
     }
 }

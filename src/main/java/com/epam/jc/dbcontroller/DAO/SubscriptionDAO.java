@@ -1,9 +1,9 @@
-package com.epam.jc.dbcontroller.DAO;
+package com.epam.jc.DbController.DAO;
 
-import com.epam.jc.dbcontroller.ConnectionPool.ConnectionPool;
-import com.epam.jc.dbcontroller.ConnectionPool.PooledConnection;
-import com.epam.jc.dbcontroller.Entities.Order;
-import com.epam.jc.dbcontroller.Entities.Subscription;
+import com.epam.jc.DbController.ConnectionPool.ConnectionPool;
+import com.epam.jc.DbController.ConnectionPool.PooledConnection;
+import com.epam.jc.DbController.Entities.Order;
+import com.epam.jc.DbController.Entities.Subscription;
 
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -84,6 +84,10 @@ public class SubscriptionDAO {
             st.setLong(1, orderId);
             st.setLong(2, magazineId);
             ResultSet resultSet = st.executeQuery();
+            if (!resultSet.next()) {
+                throw new SQLException("No subscription with orderId # " + orderId + " and magazineId #" +
+                    magazineId + " is available");
+            }
             return new Subscription(
                     resultSet.getLong("order_id"),
                     resultSet.getLong("magazine_id"),

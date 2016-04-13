@@ -1,4 +1,4 @@
-package com.epam.jc.dbcontroller.Entities;
+package com.epam.jc.DbController.Entities;
 
 import java.sql.Date;
 
@@ -47,5 +47,15 @@ public class Subscription {
     public void setMonths(Long months) {
         this.months = months;
 
+    }
+
+    @Override
+    public String toString() {
+        return "Subscription{" +
+                "orderId=" + orderId +
+                ", magazine_Id=" + magazine_Id +
+                ", startDate=" + startDate +
+                ", months=" + months +
+                '}';
     }
 }

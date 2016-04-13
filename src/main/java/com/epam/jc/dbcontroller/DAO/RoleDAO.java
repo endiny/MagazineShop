@@ -1,8 +1,8 @@
-package com.epam.jc.dbcontroller.DAO;
+package com.epam.jc.DbController.DAO;
 
-import com.epam.jc.dbcontroller.ConnectionPool.ConnectionPool;
-import com.epam.jc.dbcontroller.ConnectionPool.PooledConnection;
-import com.epam.jc.dbcontroller.Entities.Role;
+import com.epam.jc.DbController.ConnectionPool.ConnectionPool;
+import com.epam.jc.DbController.ConnectionPool.PooledConnection;
+import com.epam.jc.DbController.Entities.Role;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -40,7 +40,7 @@ public class RoleDAO {
         }
         catch (SQLException e) {
             e.printStackTrace();
-            return Collections.<Role>emptyList();
+            return Collections.emptyList();
         }
     }
 
@@ -48,10 +48,13 @@ public class RoleDAO {
         ConnectionPool instance = ConnectionPool.getInstance();
         try (PooledConnection conn = PooledConnection.wrap(instance.takeConnection(),
                 instance.getFreeConnections(), instance.getReservedConnections())) {
-            String sql = "SELECT * FROM roles WHERE id=?";
+            String sql = "SELECT * FROM roles WHERE id=(?)";
             PreparedStatement st = conn.prepareStatement(sql);
             st.setLong(1, id);
             ResultSet result = st.executeQuery();
+            if (!result.next()) {
+                throw new SQLException("No role with id #" + id + " is available.");
+            }
             return new Role(result.getLong("id"), result.getString("name"));
         }
         catch (SQLException e) {

@@ -1,4 +1,4 @@
-package com.epam.jc.dbcontroller.Entities;
+package com.epam.jc.DbController.Entities;
 
 /**
  * Created on 07.04.16.
@@ -10,16 +10,6 @@ public class Magazine {
     private String name;
     private Double price;
     private String description;
-
-    @Override
-    public String toString() {
-        return "Magazine{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", price=" + price +
-                ", description='" + description + '\'' +
-                '}';
-    }
 
     public Magazine(Long id, String name, Double price, String description) {
         this.id = id;
@@ -54,5 +44,15 @@ public class Magazine {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    @Override
+    public String toString() {
+        return "Magazine{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", price=" + price +
+                ", description='" + description + '\'' +
+                '}';
     }
 }

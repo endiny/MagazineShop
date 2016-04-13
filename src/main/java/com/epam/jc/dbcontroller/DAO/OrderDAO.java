@@ -1,9 +1,9 @@
-package com.epam.jc.dbcontroller.DAO;
+package com.epam.jc.DbController.DAO;
 
-import com.epam.jc.dbcontroller.ConnectionPool.ConnectionPool;
-import com.epam.jc.dbcontroller.ConnectionPool.PooledConnection;
-import com.epam.jc.dbcontroller.Entities.Order;
-import com.epam.jc.dbcontroller.Entities.User;
+import com.epam.jc.DbController.ConnectionPool.ConnectionPool;
+import com.epam.jc.DbController.ConnectionPool.PooledConnection;
+import com.epam.jc.DbController.Entities.Order;
+import com.epam.jc.DbController.Entities.User;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -54,6 +54,9 @@ public class OrderDAO {
             PreparedStatement st = conn.prepareStatement(sql);
             st.setLong(1, id);
             ResultSet result = st.executeQuery();
+            if (!result.next()) {
+                throw new SQLException("No order with id #" + id + " is available.");
+            }
             return new Order(
                     result.getLong("id"),
                     result.getLong("user_id"),

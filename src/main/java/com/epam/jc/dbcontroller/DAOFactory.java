@@ -1,7 +1,6 @@
-package com.epam.jc.dbcontroller;
+package com.epam.jc.DbController;
 
-import com.epam.jc.dbcontroller.DAO.*;
-import com.epam.jc.dbcontroller.Entities.Magazine;
+import com.epam.jc.DbController.DAO.*;
 
 /**
  * Created on 07.04.16.
@@ -9,29 +8,24 @@ import com.epam.jc.dbcontroller.Entities.Magazine;
  * @author Vladislav Boboshko
  */
 public class DAOFactory {
-    private static DAOFactory instance;
-    private DAOFactory() {}
-    public static DAOFactory getInstance() {
-        return (instance==null)?(instance = new DAOFactory()):instance;
-    }
 
-    public MagazineDAO getMagazineDAO() {
+    public static MagazineDAO getMagazineDAO() {
         return MagazineDAO.getInstance();
     }
 
-    public OrderDAO getOrderDAO() {
+    public static OrderDAO getOrderDAO() {
         return OrderDAO.getInstance();
     }
 
-    public RoleDAO getRoleDAO() {
+    public static RoleDAO getRoleDAO() {
         return RoleDAO.getInstance();
     }
 
-    public SubscriptionDAO getSubscriptionDAO() {
+    public static SubscriptionDAO getSubscriptionDAO() {
         return SubscriptionDAO.getInstance();
     }
 
-    public UserDAO getUserDAO() {
+    public static UserDAO getUserDAO() {
         return UserDAO.getInstance();
     }
 
