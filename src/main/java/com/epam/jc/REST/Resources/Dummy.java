@@ -1,4 +1,4 @@
-package com.epam.jc.REST.Resource;
+package com.epam.jc.REST.Resources;
 
 /**
  * Created on 14/04/16.

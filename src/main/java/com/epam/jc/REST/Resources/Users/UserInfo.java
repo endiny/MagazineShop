@@ -1,9 +1,12 @@
-package com.epam.jc.REST.Resource.Users;
+package com.epam.jc.REST.Resources.Users;
 
 import com.epam.jc.DbController.DAOFactory;
 import com.epam.jc.DbController.Entities.User;
+import com.epam.jc.REST.Common;
 import com.epam.jc.REST.Security.LoginDispatcher;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -22,12 +25,8 @@ import java.util.Optional;
 @Path("user")
 public class UserInfo {
 
-//    @GET
-//    @Produces(MediaType.TEXT_PLAIN)
-//    public String getUser(@Context HttpServletRequest request) {
-//        return request.getSession().getId();
-//    }
     @GET
+    @Produces(MediaType.APPLICATION_JSON)
     public Response getUser(@Context HttpServletRequest requestContext) {
         HttpSession session = requestContext.getSession();
         JSONObject result = new JSONObject();
@@ -47,6 +46,7 @@ public class UserInfo {
 
     @GET
     @Path("id/{userId}")
+    @Produces(MediaType.APPLICATION_JSON)
     public Response getUserById(@Context HttpServletRequest requestContext, @PathParam("userId") String userId) {
         HttpSession session = requestContext.getSession();
         JSONObject result = new JSONObject();
@@ -55,17 +55,50 @@ public class UserInfo {
             id = Long.parseLong(userId);
         }
         catch (NumberFormatException e) {
-            id = 0L;
+            return Response.status(401).build();
         }
-        if ((id==0) || !LoginDispatcher.getInstance().isUserInRole(session, "admin")) {
-            result.put("error", 403);
-            return Response.ok().entity(result.toJSONString()).build();
+        if (!LoginDispatcher.getInstance().isUserInRole(session, "admin")) {
+            return Response.status(403).build();
         }
         User user = DAOFactory.getUserDAO().getUser(id);
+        if (user.getId() == 0) {
+            return Response.status(404).build();
+        }
         result.put("id", user.getId());
         result.put("login", user.getLogin());
         result.put("name", user.getName());
         result.put("role", user.getRole());
         return Response.ok().entity(result.toJSONString()).build();
+    }
+
+    @POST
+    @Path("id/{userId")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response editUser(@Context HttpServletRequest requestContext) {
+        JSONObject response = new JSONObject();
+        Optional<User> user = Optional.ofNullable((User) requestContext.getSession().getAttribute("user"));
+        User user1;
+        if (!user.isPresent()) {
+            return Response.status(401).build();
+        }
+        try {
+            JSONObject request = (JSONObject) new JSONParser().parse(Common.getRequestBody(requestContext));
+            user1 = new User(
+                    ((Long) request.get("id")),
+                    ((String) request.get("login")),
+                    ((String) request.get("name")),
+                    ((String) request.get("passwd")),
+                    user.get().getRole());
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return Response.status(400).build();
+        }
+        if (!DAOFactory.getUserDAO().updateUser(user1)) {
+            return Response.status(500).build();
+        }
+        return Response.ok().build();
+
+
     }
 }
