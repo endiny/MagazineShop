@@ -10,6 +10,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created on 07.04.16.
@@ -44,7 +45,7 @@ public class RoleDAO {
         }
     }
 
-    public Role getRole(Long id) {
+    public Optional<Role> getRole(Long id) {
         ConnectionPool instance = ConnectionPool.getInstance();
         try (PooledConnection conn = PooledConnection.wrap(instance.takeConnection(),
                 instance.getFreeConnections(), instance.getReservedConnections())) {
@@ -55,11 +56,11 @@ public class RoleDAO {
             if (!result.next()) {
                 throw new SQLException("No role with id #" + id + " is available.");
             }
-            return new Role(result.getLong("id"), result.getString("name"));
+            return Optional.of(new Role(result.getLong("id"), result.getString("name")));
         }
         catch (SQLException e) {
             e.printStackTrace();
-            return new Role(0L, "");
+            return Optional.empty();
         }
     }
 }

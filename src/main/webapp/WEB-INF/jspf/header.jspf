@@ -1,0 +1,95 @@
+<%--<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>--%>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<jsp:useBean id="user" type="com.epam.jc.DbController.Entities.User" scope="session"/>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <link rel="icon" href="../../favicon.ico">
+
+    <title></title>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- Static navbar -->
+
+    <c:choose>
+    <c:when test="${user.role == 1}">
+    <nav class="navbar navbar-default navbar-inverse">
+        </c:when>
+        <c:otherwise>
+        <nav class="navbar navbar-default">
+            </c:otherwise>
+            </c:choose>
+
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+                            aria-expanded="false" aria-controls="navbar">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="/main">Sharashkina Kontora</a>
+                </div>
+                <div id="navbar" class="navbar-collapse collapse">
+                    <ul class="nav navbar-nav">
+                        <li><a href="/main">Main</a></li>
+                        <li><a href="/orders">Orders</a></li>
+                        <li><a href="/account">Account</a></li>
+                        <li><a href="/catalog">Catalog</a></li>
+
+
+                        <%--<li><a href="/admin/tariff_list">Role  :  <c:out value="${user.role}" /></a></li>--%>
+                        <c:if test="${user.role.equals('admin') || user.role.equals('manager')}">
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                                   aria-haspopup="true"
+                                   aria-expanded="false">Administration<span class="caret"></span></a>
+                                <ul class="dropdown-menu">
+                                    <c:if test="${user.role.equals('admin')}">
+                                        <li><a href="/admin/service_list">Services</a></li>
+                                    </c:if>
+                                    <li><a href="/admin/user_list">Users</a></li>
+                                    <li><a href="/admin/tariff_list">Role</a></li>
+                                    <li role="separator" class="divider"></li>
+                                    <li class="dropdown-header">Role: ${user.role}</li>
+                                </ul>
+                            </li>
+                        </c:if>
+
+                    </ul>
+
+                    <ul class="nav navbar-nav navbar-right">
+                        <c:if test="${user.role == null}">
+                            <li><a href="/login">Login</a></li>
+                        </c:if>
+                        <c:if test="${user.role != null}">
+                            <li><a href="/signout">Logout</a></li>
+                        </c:if>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                               aria-haspopup="true"
+                               aria-expanded="false">Lang<span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="/change_locale?locale=ru_RU">Русский</a></li>
+                                <li><a href="/change_locale?locale=en_US">English</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+
+                </div><!--/.nav-collapse -->
+            </div><!--/.container-fluid -->
+        </nav>
+

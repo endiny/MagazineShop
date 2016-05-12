@@ -6,6 +6,7 @@ import com.epam.jc.DbController.Entities.User;
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.ForbiddenException;
 import java.util.HashMap;
+import java.util.Optional;
 
 /**
  * Created on 13/04/16.
@@ -23,15 +24,19 @@ public class LoginDispatcher {
         return (instance==null)?(instance = new LoginDispatcher()):instance;
     }
 
-    public boolean authorize(String login, String password, HttpSession session) {
-        User user = DAOFactory.getUserDAO().getUserByLogin(login);
+    public Optional<User> authorize(String login, String password, HttpSession session) {
+        Optional<User> userByLogin = DAOFactory.getUserDAO().getUserByLogin(login);
+        if (!userByLogin.isPresent()) {
+            return Optional.empty();
+        }
+        User user = userByLogin.get();
         if (!(user.getPasswd().equals(password) && user.getLogin().equals(login))) {
-            return false;
+            return Optional.empty();
         }
         user.setPasswd("");
         session.setAttribute("user", user);
         session.setMaxInactiveInterval(0);
-        return true;
+        return Optional.of(user);
     }
 
     public boolean isUserInRole(HttpSession session, String role) {
@@ -39,7 +44,7 @@ public class LoginDispatcher {
         if (user == null) {
             return false;
         }
-        return roleChecker(user.getRole()).equals(role);
+        return user.getRole().equals(role);
 
     }
 

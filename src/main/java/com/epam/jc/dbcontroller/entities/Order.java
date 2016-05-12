@@ -1,5 +1,7 @@
 package com.epam.jc.DbController.Entities;
 
+import org.json.simple.JSONObject;
+
 import java.sql.Timestamp;
 
 /**
@@ -16,8 +18,26 @@ public class Order {
     private Boolean paid;
     private String shipAddress;
 
-    public Order(Long id, Long userId, Timestamp orderTime, Double toPay, Boolean paid, String shipAddress) {
-        this.id = id;
+    @Override
+    public String toString() {
+        return toJSON().toJSONString();
+    }
+
+    public JSONObject toJSON() {
+        JSONObject order = new JSONObject();
+        order.put("id", getId());
+        order.put("timestamp", getOrderTime().getTime());
+        order.put("ship", getShipAddress());
+        order.put("sum", getToPay());
+        order.put("paid", isPaid());
+        return order;
+    }
+
+    public Timestamp getOrderTime() {
+        return orderTime;
+    }
+
+    public Order(Long userId, Timestamp orderTime, Double toPay, Boolean paid, String shipAddress) {
         this.userId = userId;
         this.orderTime = orderTime;
         this.toPay = toPay;
@@ -25,14 +45,10 @@ public class Order {
         this.shipAddress = shipAddress;
     }
 
-    public Timestamp getOrderTime() {
-        return orderTime;
-    }
-
-    public Order(Long id, Long userId, Long orderTime, Double toPay, Boolean paid, String shipAddress) {
+    public Order(Long id, Long userId, Timestamp orderTime, Double toPay, Boolean paid, String shipAddress) {
         this.id = id;
         this.userId = userId;
-        this.orderTime = new Timestamp(orderTime);
+        this.orderTime = orderTime;
         this.toPay = toPay;
         this.paid = paid;
         this.shipAddress = shipAddress;
@@ -75,15 +91,4 @@ public class Order {
         this.shipAddress = shipAddress;
     }
 
-    @Override
-    public String toString() {
-        return "Order{" +
-                "id=" + id +
-                ", userId=" + userId +
-                ", orderTime=" + orderTime +
-                ", toPay=" + toPay +
-                ", paid=" + paid +
-                ", shipAddress='" + shipAddress + '\'' +
-                '}';
-    }
 }

@@ -10,6 +10,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created on 07.04.16.
@@ -35,17 +36,16 @@ public class UserDAO {
             st.setString(1, user.getLogin());
             st.setString(2, user.getPasswd());
             st.setString(3, user.getName());
-            st.setLong(4, user.getRole());
-            st.execute();
+            st.setString(4, user.getRole());
+            return (st.executeUpdate() != 0);
         }
         catch (SQLException e) {
             e.printStackTrace();
             return false;
         }
-        return true;
     }
 
-    public User getUser(Long userId) {
+    public Optional<User> getUser(Long userId) {
         ConnectionPool instance = ConnectionPool.getInstance();
 
         try (PooledConnection conn = PooledConnection.wrap(instance.takeConnection(),
@@ -61,16 +61,16 @@ public class UserDAO {
             String login = result.getString("login");
             String passwd = result.getString("passwd");
             String name = result.getString("real_name");
-            Long role = result.getLong("role_id");
-            return new User(id, login, name, passwd, role);
+            String role = result.getString("role_id");
+            return Optional.of(new User(id, login, name, passwd, role));
         }
         catch (SQLException e) {
             e.printStackTrace();
-            return new User(0L, "", "", "", 0L);
+            return Optional.empty();
         }
     }
 
-    public User getUserByLogin(String login) {
+    public Optional<User> getUserByLogin(String login) {
         ConnectionPool instance = ConnectionPool.getInstance();
 
         try (PooledConnection conn = PooledConnection.wrap(instance.takeConnection(),
@@ -86,12 +86,12 @@ public class UserDAO {
             String username = result.getString("login");
             String passwd = result.getString("passwd");
             String name = result.getString("real_name");
-            Long role = result.getLong("role_id");
-            return new User(id, username, name, passwd, role);
+            String role = result.getString("role_id");
+            return Optional.of(new User(id, username, name, passwd, role));
         }
         catch (SQLException e) {
             e.printStackTrace();
-            return new User(0L, "", "", "", 0L);
+            return Optional.empty();
         }
     }
 
@@ -102,8 +102,7 @@ public class UserDAO {
             String sql = "DELETE from users WHERE id=(?)";
             PreparedStatement st = conn.prepareStatement(sql);
             st.setLong(1, id);
-            st.execute();
-            return true;
+            return (st.executeUpdate() != 0);
         }
         catch (SQLException e) {
             e.printStackTrace();
@@ -124,10 +123,9 @@ public class UserDAO {
             st.setString(1, user.getLogin());
             st.setString(2, user.getPasswd());
             st.setString(3, user.getName());
-            st.setLong(4, user.getRole());
+            st.setString(4, user.getRole());
             st.setLong(5, user.getId());
-            st.execute();
-            return true;
+            return (st.executeUpdate() != 0);
         }
         catch (SQLException e) {
             e.printStackTrace();
@@ -148,7 +146,7 @@ public class UserDAO {
                 String login = result.getString("login");
                 String passwd = result.getString("passwd");
                 String name = result.getString("name");
-                Long role = result.getLong("role_id");
+                String role = result.getString("role_id");
                 users.add(new User(id, login, name, passwd, role));
             }
             return users;

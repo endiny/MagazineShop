@@ -1,5 +1,7 @@
 package com.epam.jc.DbController.Entities;
 
+import org.json.simple.JSONObject;
+
 import java.sql.Date;
 
 /**
@@ -9,31 +11,22 @@ import java.sql.Date;
  */
 public class Subscription {
     private Long orderId;
-    private Long magazine_Id;
+    private Long magazineId;
     private Date startDate;
     private Long months;
 
-    public Subscription(Long orderId, Long magazine_Id, Date startDate, Long months) {
+    public Subscription(Long orderId, Long magazineId, Long months) {
         this.orderId = orderId;
-        this.magazine_Id = magazine_Id;
-        this.startDate = startDate;
+        this.magazineId = magazineId;
         this.months = months;
     }
 
     public Long getMagazineId() {
-        return magazine_Id;
+        return magazineId;
     }
 
-    public void setMagazine_Id(Long magazine_Id) {
-        this.magazine_Id = magazine_Id;
-    }
-
-    public Date getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(Date startDate) {
-        this.startDate = startDate;
+    public void setMagazineId(Long magazineId) {
+        this.magazineId = magazineId;
     }
 
     public Long getMonths() {
@@ -51,11 +44,14 @@ public class Subscription {
 
     @Override
     public String toString() {
-        return "Subscription{" +
-                "orderId=" + orderId +
-                ", magazine_Id=" + magazine_Id +
-                ", startDate=" + startDate +
-                ", months=" + months +
-                '}';
+        return toJSON().toJSONString();
+    }
+
+    public JSONObject toJSON() {
+        JSONObject out = new JSONObject();
+        out.put("orderId", orderId);
+        out.put("magazineId", magazineId);
+        out.put("months", months);
+        return out;
     }
 }

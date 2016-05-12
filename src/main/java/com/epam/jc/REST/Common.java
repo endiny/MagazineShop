@@ -3,6 +3,7 @@ package com.epam.jc.REST;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
 /**
  * Created on 14/04/16.
@@ -11,6 +12,9 @@ import java.io.IOException;
  */
 public class Common {
     public static String getRequestBody(HttpServletRequest request) {
+        try {
+            request.setCharacterEncoding("UTF-8");
+        } catch (UnsupportedEncodingException ignored) {}
         StringBuffer income = new StringBuffer();
         try(ServletInputStream br = request.getInputStream()) {
             Character symbol;

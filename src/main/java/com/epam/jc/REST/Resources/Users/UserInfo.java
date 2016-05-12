@@ -35,8 +35,8 @@ public class UserInfo {
             result.put("result", "forbidden");
             return Response.status(403).entity(result.toJSONString()).build();
         }
-        Long id = optionalUser.orElse(new User(0L, "", "", "", 0L)).getId();
-        User user = DAOFactory.getUserDAO().getUser(id);
+        Long id = optionalUser.orElse(new User(0L, "", "", "", "")).getId();
+        User user = DAOFactory.getUserDAO().getUser(id).get();
         result.put("id", user.getId());
         result.put("login", user.getLogin());
         result.put("name", user.getName());
@@ -60,7 +60,7 @@ public class UserInfo {
         if (!LoginDispatcher.getInstance().isUserInRole(session, "admin")) {
             return Response.status(403).build();
         }
-        User user = DAOFactory.getUserDAO().getUser(id);
+        User user = DAOFactory.getUserDAO().getUser(id).get();
         if (user.getId() == 0) {
             return Response.status(404).build();
         }

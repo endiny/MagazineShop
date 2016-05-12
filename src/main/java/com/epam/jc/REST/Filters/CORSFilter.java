@@ -20,7 +20,7 @@ public class CORSFilter implements ContainerResponseFilter {
     @Override
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {
         MultivaluedMap<String, Object> headers = responseContext.getHeaders();
-        headers.add("Access-Control-Allow-Origin", "http://localhost:3000");
+        headers.add("Access-Control-Allow-Origin", "http://localhost:8080");
         headers.add("Access-Control-Allow-Headers",
                 "origin, content-type, accept, authorization");
         headers.add("Access-Control-Allow-Credentials", "true");

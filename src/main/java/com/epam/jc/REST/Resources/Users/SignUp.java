@@ -33,11 +33,11 @@ public class SignUp {
         User user;
         try {
             JSONObject request = ((JSONObject) new JSONParser().parse(Common.getRequestBody(requestContext)));
-            user = new User(((String) request.get("login")),
-                    ((String) request.get("name")),
-                    ((String) request.get("password")),
-                    2L);
-        } catch (ParseException e) {
+            user = new User(new String(((String) request.get("login")).getBytes("ISO-8859-1"), "UTF-8"),
+                    new String(((String) request.get("name")).getBytes("ISO-8859-1"), "UTF-8"),
+                    new String(((String) request.get("password")).getBytes("ISO-8859-1"), "UTF-8"),
+                    "user");
+        } catch (Exception e) {
             System.err.println("Unable to parse request");
             response.put("status", "Wrong request.");
             return Response.status(400).entity(response.toJSONString()).build();

@@ -38,6 +38,7 @@ public class MagazineInfo {
         List<Magazine> magazines = DAOFactory.getMagazineDAO().getAllMagazines();
         JSONObject magazinesJSON = new JSONObject();
         JSONArray arr = new JSONArray();
+        magazinesJSON.put("amount", magazines.size());
         for (Magazine i: magazines) {
             JSONObject magazine = new JSONObject();
             magazine.put("id",i.getId());
@@ -64,9 +65,9 @@ public class MagazineInfo {
             if (id == 0) throw new NumberFormatException();
         }
         catch (NumberFormatException e) {
-            return Response.status(400).build();
+            return Response.status(400).entity("{\"result\":\"bad request\"").build();
         }
-        Magazine magazine = DAOFactory.getMagazineDAO().getMagazine(id);
+        Magazine magazine = DAOFactory.getMagazineDAO().getMagazine(id).get();
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("id", magazine.getId());
         jsonObject.put("name", magazine.getName());
@@ -77,10 +78,12 @@ public class MagazineInfo {
 
     @GET
     @Path("id/{magazineId}/delete")
+    @Produces(MediaType.APPLICATION_JSON)
     public Response deleteMagazine(@Context HttpServletRequest requestContext, @PathParam("magazineId") String sId) {
         if (!LoginDispatcher.getInstance().isUserInRole(requestContext.getSession(), "admin")) {
-            return Response.status(403).build();
+            return Response.status(403).entity("Forbidden!").build();
         }
+        JSONObject jsonResponse = new JSONObject();
         Long id;
         try {
             id = Long.parseLong(sId);
@@ -89,6 +92,7 @@ public class MagazineInfo {
         catch (NumberFormatException e) {
             return Response.status(400).build();
         }
-        if (!DAOFactory)
+        jsonResponse.put("result", DAOFactory.getMagazineDAO().deleteMagazine(id));
+        return Response.ok().entity(jsonResponse.toJSONString()).build();
     }
 }

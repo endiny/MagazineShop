@@ -10,18 +10,19 @@ package com.epam.jc.DbController.Entities;
 public class User {
     private Long id;
     private String login;
+    private String name;
+    private String passwd;
+    private String role;
 
-    public User(String login, String name, String passwd, Long role) {
+    public User(String login, String name, String passwd, String role) {
         this.login = login;
         this.name = name;
         this.passwd = passwd;
         this.role = role;
     }
 
-    private String name;
-    private String passwd;
 
-    public User(Long id, String login, String name, String passwd, Long role) {
+    public User(Long id, String login, String name, String passwd, String role) {
         this.id = id;
         this.login = login;
         this.name = name;
@@ -70,13 +71,12 @@ public class User {
         this.passwd = passwd;
     }
 
-    public Long getRole() {
+    public String getRole() {
         return role;
     }
 
-    public void setRole(Long role) {
+    public void setRole(String role) {
         this.role = role;
     }
 
-    private Long role;
 }

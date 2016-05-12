@@ -8,9 +8,11 @@ import com.epam.jc.DbController.Entities.User;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created on 07.04.16.
@@ -38,8 +40,7 @@ public class OrderDAO {
             st.setDouble(3, order.getToPay());
             st.setString(4, order.getShipAddress());
             st.setBoolean(5, order.isPaid());
-            st.execute();
-            return true;
+            return (st.executeUpdate() != 0);
         }
         catch (SQLException e) {
             e.printStackTrace();
@@ -47,7 +48,7 @@ public class OrderDAO {
         }
     }
 
-    public Order getOrder(Long id) {
+    public Optional<Order> getOrder(Long id) {
         try (PooledConnection conn = PooledConnection.wrap(connectionPool.takeConnection(),
                 connectionPool.getFreeConnections(), connectionPool.getReservedConnections())) {
             String sql = "SELECT * FROM orders WHERE id=(?)";
@@ -57,18 +58,17 @@ public class OrderDAO {
             if (!result.next()) {
                 throw new SQLException("No order with id #" + id + " is available.");
             }
-            return new Order(
+            return Optional.of(new Order(
                     result.getLong("id"),
                     result.getLong("user_id"),
                     result.getTimestamp("order_timestamp"),
                     result.getDouble("to_pay"),
                     result.getBoolean("is_paid"),
-                    result.getString("address")
-            );
+                    result.getString("address")));
         }
         catch (SQLException e) {
             e.printStackTrace();
-            return new Order(0L, 0L, 0L, 0.0, false, "");
+            return Optional.empty();
         }
     }
 
@@ -137,8 +137,8 @@ public class OrderDAO {
             st.setDouble(3, order.getToPay());
             st.setBoolean(4, order.isPaid());
             st.setString(5, order.getShipAddress());
-            st.execute();
-            return true;
+            st.setLong(6, order.getId());
+            return (st.executeUpdate() != 0);
         }
         catch (SQLException e) {
             e.printStackTrace();
@@ -156,12 +156,35 @@ public class OrderDAO {
             String sql = "DELETE FROM orders WHERE id=(?);";
             PreparedStatement st = conn.prepareStatement(sql);
             st.setLong(1, id);
-            st.execute();
-            return true;
+            return (st.executeUpdate() != 0);
         }
         catch (SQLException e) {
             e.printStackTrace();
             return false;
+        }
+    }
+
+    public Optional<Order> getLatestForUser(Long userId) {
+        try (PooledConnection conn = PooledConnection.wrap(connectionPool.takeConnection(),
+                connectionPool.getFreeConnections(), connectionPool.getReservedConnections())) {
+            String sql = "SELECT * FROM orders WHERE user_id=(?) ORDER BY id DESC LIMIT 1;";
+            PreparedStatement st = conn.prepareStatement(sql);
+            st.setLong(1, userId);
+            ResultSet result = st.executeQuery();
+            if (!result.next()) {
+                throw new SQLException("No orders for user with id #" + userId + " is available.");
+            }
+            return Optional.of(new Order(
+                    result.getLong("id"),
+                    result.getLong("user_id"),
+                    result.getTimestamp("order_timestamp"),
+                    result.getDouble("to_pay"),
+                    result.getBoolean("is_paid"),
+                    result.getString("address")));
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+            return Optional.empty();
         }
     }
 }

@@ -10,6 +10,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created on 07.04.16.
@@ -32,8 +33,7 @@ public class MagazineDAO {
             st.setString(1, magazine.getName());
             st.setDouble(2, magazine.getPrice());
             st.setString(3, magazine.getDescription());
-            st.execute();
-            return true;
+            return (st.executeUpdate() != 0);
         }
         catch (SQLException e) {
             e.printStackTrace();
@@ -52,7 +52,7 @@ public class MagazineDAO {
             st.setString(3, magazine.getDescription());
             st.setLong(4, magazine.getId());
             st.execute();
-            return true;
+            return (st.executeUpdate() != 0);
         }
         catch (SQLException e) {
             e.printStackTrace();
@@ -60,7 +60,7 @@ public class MagazineDAO {
         }
     }
 
-    public Magazine getMagazine(Long id) {
+    public Optional<Magazine> getMagazine(Long id) {
         ConnectionPool instance = ConnectionPool.getInstance();
         try (PooledConnection conn = PooledConnection.wrap(instance.takeConnection(),
                 instance.getFreeConnections(), instance.getReservedConnections())) {
@@ -71,14 +71,14 @@ public class MagazineDAO {
             if (!result.next()) {
                 throw new SQLException("No magazine with id #" + id + " is available.");
             }
-            return new Magazine(result.getLong("id"),
+            return Optional.of(new Magazine(result.getLong("id"),
                     result.getString("name"),
                     result.getDouble("price"),
-                    result.getString("description"));
+                    result.getString("description")));
         }
         catch (SQLException e) {
             e.printStackTrace();
-            return new Magazine(0L, "", 0.0, "");
+            return Optional.empty();
         }
     }
 
@@ -94,7 +94,7 @@ public class MagazineDAO {
                 Long id = result.getLong("id");
                 String name = result.getString("name");
                 Double price = result.getDouble("price");
-                String desc = result.getString("decription");
+                String desc = result.getString("description");
                 magazines.add(new Magazine(id, name, price, desc));
             }
             return magazines;
@@ -112,8 +112,7 @@ public class MagazineDAO {
             String sql = "DELETE FROM magazines WHERE id=(?)";
             PreparedStatement st = conn.prepareStatement(sql);
             st.setLong(1, id);
-            st.execute();
-            return true;
+            return (st.executeUpdate() != 0);
         }
         catch (SQLException e) {
             e.printStackTrace();

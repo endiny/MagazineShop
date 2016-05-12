@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created on 08.04.16.
@@ -33,14 +34,12 @@ public class SubscriptionDAO {
     public boolean addSubscription(Subscription subscription) {
         try (PooledConnection conn = PooledConnection.wrap(connectionPool.takeConnection(),
                 connectionPool.getFreeConnections(), connectionPool.getReservedConnections())) {
-            String sql = "INSERT INTO subscriptions (order_id, magazine_id, start_date, months) VALUES (?,?,?,?);";
+            String sql = "INSERT INTO subscriptions (order_id, magazine_id, months) VALUES (?,?,?);";
             PreparedStatement st = conn.prepareStatement(sql);
             st.setLong(1, subscription.getOrderId());
             st.setLong(2, subscription.getMagazineId());
-            st.setDate(3, subscription.getStartDate());
-            st.setLong(4, subscription.getMonths());
-            st.execute();
-            return true;
+            st.setLong(3, subscription.getMonths());
+            return (st.executeUpdate() != 0);
         }
         catch (SQLException e) {
             e.printStackTrace();
@@ -64,7 +63,6 @@ public class SubscriptionDAO {
                 subscriptions.add(new Subscription(
                         resultSet.getLong("order_id"),
                         resultSet.getLong("magazine_id"),
-                        resultSet.getDate("start_date"),
                         resultSet.getLong("months")
                 ));
             }
@@ -76,7 +74,7 @@ public class SubscriptionDAO {
         }
     }
 
-    public Subscription getSubscription(Long orderId, Long magazineId) {
+    public Optional<Subscription> getSubscription(Long orderId, Long magazineId) {
         try (PooledConnection conn = PooledConnection.wrap(connectionPool.takeConnection(),
                 connectionPool.getFreeConnections(), connectionPool.getReservedConnections())) {
             String sql = "SELECT * FROM subscriptions where order_id=(?) AND magazine_id=(?);";
@@ -88,15 +86,14 @@ public class SubscriptionDAO {
                 throw new SQLException("No subscription with orderId # " + orderId + " and magazineId #" +
                     magazineId + " is available");
             }
-            return new Subscription(
+            return Optional.of(new Subscription(
                     resultSet.getLong("order_id"),
                     resultSet.getLong("magazine_id"),
-                    resultSet.getDate("start_date"),
-                    resultSet.getLong("months"));
+                    resultSet.getLong("months")));
         }
         catch (SQLException e) {
             e.printStackTrace();
-            return new Subscription(0L, 0L, new Date(0), 0L);
+            return Optional.empty();
         }
     }
 
@@ -105,12 +102,10 @@ public class SubscriptionDAO {
                 connectionPool.getFreeConnections(), connectionPool.getReservedConnections())) {
             String sql = "UPDATE subscriptions SET start_date=(?), months=(?) WHERE order_id=(?) and magazine_id=(?);";
             PreparedStatement st = conn.prepareStatement(sql);
-            st.setDate(1, subscription.getStartDate());
-            st.setLong(2, subscription.getMonths());
-            st.setLong(3, subscription.getOrderId());
-            st.setLong(4, subscription.getMagazineId());
-            st.execute();
-            return true;
+            st.setLong(1, subscription.getMonths());
+            st.setLong(2, subscription.getOrderId());
+            st.setLong(3, subscription.getMagazineId());
+            return (st.executeUpdate() != 0);
         }
         catch (SQLException e) {
             e.printStackTrace();
@@ -121,14 +116,12 @@ public class SubscriptionDAO {
     public boolean deleteSubscription(Subscription subscription) {
         try (PooledConnection conn = PooledConnection.wrap(connectionPool.takeConnection(),
                 connectionPool.getFreeConnections(), connectionPool.getReservedConnections())) {
-            String sql = "DELETE FROM subscriptions WHERE order_id=(?) and magazine_id=(?) and start_date=(?) and months=(?);";
+            String sql = "DELETE FROM subscriptions WHERE order_id=(?) and magazine_id=(?) and months=(?);";
             PreparedStatement st = conn.prepareStatement(sql);
             st.setLong(1, subscription.getOrderId());
             st.setLong(2, subscription.getMagazineId());
-            st.setDate(3, subscription.getStartDate());
-            st.setLong(4, subscription.getMonths());
-            st.execute();
-            return true;
+            st.setLong(3, subscription.getMonths());
+            return (st.executeUpdate() != 0);
         }
         catch (SQLException e) {
             return false;
@@ -145,8 +138,7 @@ public class SubscriptionDAO {
             String sql = "DELETE FROM subscriptions WHERE order_id=(?);";
             PreparedStatement st = conn.prepareStatement(sql);
             st.setLong(1, orderId);
-            st.execute();
-            return true;
+            return (st.executeUpdate() != 0);
         }
         catch (SQLException e) {
             e.printStackTrace();
