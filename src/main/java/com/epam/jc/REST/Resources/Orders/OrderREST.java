@@ -59,17 +59,19 @@ public class OrderREST {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("delete/{id}")
     public Response deleteOrder(@Context HttpServletRequest request, @PathParam("id") String restId) {
-        if (!LoginDispatcher.getInstance().isUserInRole(request.getSession(), "user")) {
-            return Response.status(403).entity("result:forbidden").build();
+        Optional<User> user = Optional.ofNullable((User)request.getSession().getAttribute("user"));
+        if (!user.isPresent()) {
+            return Response.status(403).entity("{error:forbidden}").build();
         }
         Long id;
         try {
             id = Long.parseLong(restId);
         } catch (NumberFormatException e) {
-            return Response.status(400).entity("\"result\":\"bad\"").build();
+            return Response.status(400).entity("{\"result\":\"bad\"}").build();
         }
-        if (!DAOFactory.getOrderDAO().getOrder(id).get().getUserId().equals(((User) request.getSession().getAttribute("user")).getId())) {
-            return Response.status(403).entity("\"result\":\"forbidden\"").build();
+        Optional<Order> order = DAOFactory.getOrderDAO().getOrder(id);
+        if (!order.isPresent() || !order.get().getUserId().equals(user.get().getId()) || order.get().isPaid()) {
+            return Response.status(403).entity("{error:forbidden}").build();
         }
         DAOFactory.getSubscriptionDAO().deleteSubscriptionsForOrder(id);
         DAOFactory.getOrderDAO().deleteOrder(id);
@@ -78,24 +80,28 @@ public class OrderREST {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("id/{id}")
-    public Response getOrderById(@Context HttpServletRequest request, @PathParam("id") String restId) {
-        if (!LoginDispatcher.getInstance().isUserInRole(request.getSession(), "user")) {
-            return Response.status(403).entity("\"error\":\"forbidden\"").build();
+    @Path("pay/{id}")
+    public Response payForOrderById(@Context HttpServletRequest request, @PathParam("id") String restId) {
+        Optional<User> user = Optional.ofNullable((User)request.getSession().getAttribute("user"));
+        if (!user.isPresent()) {
+            return Response.status(403).entity("{error:forbidden}").build();
         }
         Long id;
         try {
             id = Long.parseLong(restId);
         } catch (NumberFormatException e) {
-            return Response.status(400).entity("\"result\":\"bad\"").build();
+            return Response.status(400).entity("{\"result\":\"bad\"}").build();
         }
-        Order order = DAOFactory.getOrderDAO().getOrder(id).get();
-        if (!order.getUserId().equals(((User) request.getSession().getAttribute("user")).getId())) {
-            return Response.status(403).entity("\"error\":\"forbidden\"").build();
+        Optional<Order> order = DAOFactory.getOrderDAO().getOrder(id);
+        if (order.isPresent() && order.get().getUserId().equals(user.get().getId())) {
+            order.get().setPaid(true);
+            JSONObject jsonResponse = new JSONObject();
+            jsonResponse.put("id", order.get().getId());
+            jsonResponse.put("paid", DAOFactory.getOrderDAO().updateOrder(order.get()));
+            return Response.ok().entity(jsonResponse.toJSONString()).build();
+        } else {
+            return Response.status(403).entity("{error:forbidden}").build();
         }
-        JSONObject jsonResponse = new JSONObject();
-        JSONArray array = new JSONArray();
-        return Response.ok().entity(order.toString()).build();
 
     }
 

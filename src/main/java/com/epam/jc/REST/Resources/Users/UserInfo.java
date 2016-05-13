@@ -72,7 +72,7 @@ public class UserInfo {
     }
 
     @POST
-    @Path("id/{userId")
+    @Path("id/{userId}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response editUser(@Context HttpServletRequest requestContext) {
