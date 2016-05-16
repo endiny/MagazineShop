@@ -2,10 +2,9 @@ package com.epam.jc.REST.Resources.Users;
 
 import com.epam.jc.DbController.DAOFactory;
 import com.epam.jc.DbController.Entities.User;
-import com.epam.jc.REST.Common;
+import com.epam.jc.Common.RequestService;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
@@ -32,7 +31,7 @@ public class SignUp {
         JSONObject response = new JSONObject();
         User user;
         try {
-            JSONObject request = ((JSONObject) new JSONParser().parse(Common.getRequestBody(requestContext)));
+            JSONObject request = ((JSONObject) new JSONParser().parse(RequestService.getRequestBody(requestContext)));
             user = new User(new String(((String) request.get("login")).getBytes("ISO-8859-1"), "UTF-8"),
                     new String(((String) request.get("name")).getBytes("ISO-8859-1"), "UTF-8"),
                     new String(((String) request.get("password")).getBytes("ISO-8859-1"), "UTF-8"),

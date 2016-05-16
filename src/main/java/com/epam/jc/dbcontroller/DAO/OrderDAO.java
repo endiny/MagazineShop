@@ -4,6 +4,8 @@ import com.epam.jc.DbController.ConnectionPool.ConnectionPool;
 import com.epam.jc.DbController.ConnectionPool.PooledConnection;
 import com.epam.jc.DbController.Entities.Order;
 import com.epam.jc.DbController.Entities.User;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -20,6 +22,7 @@ import java.util.Optional;
  * @author Vladislav Boboshko
  */
 public class OrderDAO {
+    private final static Logger logger = LogManager.getLogger(OrderDAO.class.getName());
     private OrderDAO() {
         connectionPool = ConnectionPool.getInstance();
     }
@@ -43,7 +46,7 @@ public class OrderDAO {
             return (st.executeUpdate() != 0);
         }
         catch (SQLException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
             return false;
         }
     }
@@ -67,7 +70,7 @@ public class OrderDAO {
                     result.getString("address")));
         }
         catch (SQLException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
             return Optional.empty();
         }
     }
@@ -92,7 +95,7 @@ public class OrderDAO {
             return orders;
         }
         catch (SQLException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
             return Collections.emptyList();
         }
     }
@@ -122,7 +125,7 @@ public class OrderDAO {
             return orders;
         }
         catch (SQLException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
             return Collections.emptyList();
         }
     }
@@ -141,7 +144,7 @@ public class OrderDAO {
             return (st.executeUpdate() != 0);
         }
         catch (SQLException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
             return false;
         }
     }
@@ -159,7 +162,7 @@ public class OrderDAO {
             return (st.executeUpdate() != 0);
         }
         catch (SQLException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
             return false;
         }
     }
@@ -183,7 +186,7 @@ public class OrderDAO {
                     result.getString("address")));
         }
         catch (SQLException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
             return Optional.empty();
         }
     }

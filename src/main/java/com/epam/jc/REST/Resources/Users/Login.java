@@ -1,20 +1,18 @@
 package com.epam.jc.REST.Resources.Users;
 
 import com.epam.jc.DbController.Entities.User;
-import com.epam.jc.REST.Common;
+import com.epam.jc.Common.RequestService;
 import com.epam.jc.REST.Security.LoginDispatcher;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.IOException;
 import java.util.Optional;
 
 /**
@@ -34,7 +32,7 @@ public class Login {
         HttpSession session = requestContext.getSession();
         int code = 400;
         try {
-            JSONObject JSONRequest = (JSONObject) parser.parse(Common.getRequestBody(requestContext));
+            JSONObject JSONRequest = (JSONObject) parser.parse(RequestService.getRequestBody(requestContext));
             String login = (String) JSONRequest.get("login");
             String passwd = (String) JSONRequest.get("password");
             Optional<User> logon = LoginDispatcher.getInstance().authorize(login, passwd, session);

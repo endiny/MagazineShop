@@ -2,11 +2,10 @@ package com.epam.jc.REST.Resources.Users;
 
 import com.epam.jc.DbController.DAOFactory;
 import com.epam.jc.DbController.Entities.User;
-import com.epam.jc.REST.Common;
+import com.epam.jc.Common.RequestService;
 import com.epam.jc.REST.Security.LoginDispatcher;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -72,7 +71,7 @@ public class UserInfo {
     }
 
     @POST
-    @Path("id/{userId}")
+    @Path("edit")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response editUser(@Context HttpServletRequest requestContext) {
@@ -83,22 +82,24 @@ public class UserInfo {
             return Response.status(401).build();
         }
         try {
-            JSONObject request = (JSONObject) new JSONParser().parse(Common.getRequestBody(requestContext));
-            user1 = new User(
-                    ((Long) request.get("id")),
-                    ((String) request.get("login")),
-                    ((String) request.get("name")),
-                    ((String) request.get("passwd")),
-                    user.get().getRole());
-        } catch (ParseException e) {
+            JSONObject request = (JSONObject) new JSONParser().parse(RequestService.getRequestBody(requestContext));
+            Optional<User> editUser = DAOFactory.getUserDAO().getUser(user.get().getId());
+            if (!editUser.isPresent()) {
+                throw new Exception("User not found");
+            }
+            String name = new String(((String) request.get("name")).getBytes("ISO-8859-1"), "UTF-8");
+            String password = new String(((String) request.get("password")).getBytes("ISO-8859-1"), "UTF-8");
+            editUser.get().setName(name);
+            if (!password.equals("none")) {
+                editUser.get().setPasswd(password);
+            }
+            boolean result = DAOFactory.getUserDAO().updateUser(editUser.get());
+            response.put("update", result);
+            return Response.status(result?200:400).entity(response.toJSONString()).build();
+
+        } catch (Exception e) {
             e.printStackTrace();
             return Response.status(400).build();
         }
-        if (!DAOFactory.getUserDAO().updateUser(user1)) {
-            return Response.status(500).build();
-        }
-        return Response.ok().build();
-
-
     }
 }

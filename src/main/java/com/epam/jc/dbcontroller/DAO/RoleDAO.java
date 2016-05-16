@@ -3,6 +3,8 @@ package com.epam.jc.DbController.DAO;
 import com.epam.jc.DbController.ConnectionPool.ConnectionPool;
 import com.epam.jc.DbController.ConnectionPool.PooledConnection;
 import com.epam.jc.DbController.Entities.Role;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -18,6 +20,7 @@ import java.util.Optional;
  * @author Vladislav Boboshko
  */
 public class RoleDAO {
+    private static final Logger logger = LogManager.getLogger(RoleDAO.class.getName());
     private RoleDAO() {}
     private static RoleDAO instance;
     public static RoleDAO getInstance() {
@@ -40,7 +43,7 @@ public class RoleDAO {
             return roles;
         }
         catch (SQLException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
             return Collections.emptyList();
         }
     }

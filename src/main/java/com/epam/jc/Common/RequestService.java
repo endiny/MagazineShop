@@ -1,4 +1,7 @@
-package com.epam.jc.REST;
+package com.epam.jc.Common;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -10,11 +13,12 @@ import java.io.UnsupportedEncodingException;
  *
  * @author Vladislav Boboshko
  */
-public class Common {
+public class RequestService {
+    private static final Logger logger = LogManager.getLogger(RequestService.class.getName());
     public static String getRequestBody(HttpServletRequest request) {
         try {
             request.setCharacterEncoding("UTF-8");
-        } catch (UnsupportedEncodingException ignored) {}
+        } catch (UnsupportedEncodingException ignored) {} //UTF-8 exists anywhere, i suppose
         StringBuffer income = new StringBuffer();
         try(ServletInputStream br = request.getInputStream()) {
             Character symbol;
@@ -22,7 +26,7 @@ public class Common {
                 income.append(symbol);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
             return "";
         }
         return income.toString();

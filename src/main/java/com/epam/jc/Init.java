@@ -1,5 +1,6 @@
 package com.epam.jc;
 
+import org.apache.logging.log4j.LogManager;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
 
@@ -15,6 +16,7 @@ import java.nio.charset.Charset;
 @ApplicationPath("api")
 public class Init extends ResourceConfig {
     public Init() throws NoSuchFieldException, IllegalAccessException {
+        LogManager.getLogger(this.getClass().getName()).debug("Jersey initialization");
         packages("com.epam.jc.REST");
     }
 }

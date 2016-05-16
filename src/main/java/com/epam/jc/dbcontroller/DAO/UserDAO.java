@@ -3,6 +3,8 @@ package com.epam.jc.DbController.DAO;
 import com.epam.jc.DbController.ConnectionPool.ConnectionPool;
 import com.epam.jc.DbController.ConnectionPool.PooledConnection;
 import com.epam.jc.DbController.Entities.User;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -21,6 +23,7 @@ import java.util.Optional;
 // TODO: 08/04/16 Logging is absend
 
 public class UserDAO {
+    private static final Logger logger = LogManager.getLogger(UserDAO.class.getName()); 
     private UserDAO() {}
     private static UserDAO instance;
     public static UserDAO getInstance() {
@@ -40,7 +43,7 @@ public class UserDAO {
             return (st.executeUpdate() != 0);
         }
         catch (SQLException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
             return false;
         }
     }
@@ -65,7 +68,7 @@ public class UserDAO {
             return Optional.of(new User(id, login, name, passwd, role));
         }
         catch (SQLException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
             return Optional.empty();
         }
     }
@@ -90,7 +93,7 @@ public class UserDAO {
             return Optional.of(new User(id, username, name, passwd, role));
         }
         catch (SQLException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
             return Optional.empty();
         }
     }
@@ -105,7 +108,7 @@ public class UserDAO {
             return (st.executeUpdate() != 0);
         }
         catch (SQLException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
             return false;
         }
     }
@@ -128,7 +131,7 @@ public class UserDAO {
             return (st.executeUpdate() != 0);
         }
         catch (SQLException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
             return false;
         }
     }
@@ -152,7 +155,7 @@ public class UserDAO {
             return users;
         }
         catch (SQLException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
             return Collections.emptyList();
         }
     }

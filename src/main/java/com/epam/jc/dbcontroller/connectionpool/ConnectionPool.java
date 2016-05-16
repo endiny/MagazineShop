@@ -1,5 +1,8 @@
 package com.epam.jc.DbController.ConnectionPool;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.*;
@@ -9,6 +12,8 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 public class ConnectionPool {
+    private final static Logger logger = LogManager.getLogger(ConnectionPool.class.getName());
+
     public BlockingQueue<Connection> getFreeConnections() {
         return freeConnections;
     }
@@ -34,6 +39,7 @@ public class ConnectionPool {
     private int poolSize;
 
     private ConnectionPool() {
+        logger.debug("ConnectionPool init has started");
         Properties properties = new Properties();
         try {
             properties.load(new FileInputStream("/Users/endiny/workspace/MagazineServer/src/main/resources/db.properties"));
@@ -65,8 +71,10 @@ public class ConnectionPool {
                 freeConnections.add(pooledConnection);
             }
         } catch (SQLException e) {
+            logger.error("SQLException in ConnectionPool");
             throw new RuntimeException("SQLException in ConnectionPool", e);
         } catch (ClassNotFoundException e) {
+            logger.error("Can't find database driver class");
             throw new RuntimeException("Can't find database driver class", e);
         }
     }
@@ -77,6 +85,7 @@ public class ConnectionPool {
             connection = freeConnections.take();
             reservedConnections.add(connection);
         } catch (InterruptedException e) {
+            logger.error("Error connecting to the data source.");
             throw new RuntimeException("Error connecting to the data source.", e);
         }
         return connection;

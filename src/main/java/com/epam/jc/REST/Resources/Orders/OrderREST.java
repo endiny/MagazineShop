@@ -5,12 +5,12 @@ import com.epam.jc.DbController.Entities.Magazine;
 import com.epam.jc.DbController.Entities.Order;
 import com.epam.jc.DbController.Entities.Subscription;
 import com.epam.jc.DbController.Entities.User;
-import com.epam.jc.REST.Common;
-import com.epam.jc.REST.Security.LoginDispatcher;
+import com.epam.jc.Common.RequestService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -21,7 +21,6 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -32,6 +31,7 @@ import java.util.Optional;
 
 @Path("orders")
 public class OrderREST {
+    private static final Logger logger = LogManager.getLogger(OrderREST.class.getName());
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -52,6 +52,7 @@ public class OrderREST {
             jsonOrders.add(jsonOrder);
         });
         jsonResponse.put("orders", jsonOrders);
+        logger.debug("Got all orders for current client");
         return Response.ok().entity(jsonResponse.toJSONString()).build();
     }
 
@@ -61,21 +62,28 @@ public class OrderREST {
     public Response deleteOrder(@Context HttpServletRequest request, @PathParam("id") String restId) {
         Optional<User> user = Optional.ofNullable((User)request.getSession().getAttribute("user"));
         if (!user.isPresent()) {
-            return Response.status(403).entity("{error:forbidden}").build();
+            logger.debug("Access denied");
+            return Response.status(401).entity("{error:forbidden}").build();
         }
         Long id;
         try {
             id = Long.parseLong(restId);
         } catch (NumberFormatException e) {
-            return Response.status(400).entity("{\"result\":\"bad\"}").build();
+            logger.error(e.getMessage());
+            return Response.status(400).entity("{\"result\":\"Bad order number\"}").build();
         }
         Optional<Order> order = DAOFactory.getOrderDAO().getOrder(id);
         if (!order.isPresent() || !order.get().getUserId().equals(user.get().getId()) || order.get().isPaid()) {
-            return Response.status(403).entity("{error:forbidden}").build();
+            logger.debug("Not enough rights for deleting this order");
+            return Response.status(403).entity("{\"error\":\"forbidden\"}").build();
         }
         DAOFactory.getSubscriptionDAO().deleteSubscriptionsForOrder(id);
         DAOFactory.getOrderDAO().deleteOrder(id);
-        return Response.ok().entity("\"result\":\"true\"").build();
+        JSONObject jsonResponse = new JSONObject();
+        jsonResponse.put("id", id);
+        jsonResponse.put("reverted", true);
+        logger.debug("Order #" + id + " and it's subscriptions are not present anymore");
+        return Response.ok().entity(jsonResponse.toJSONString()).build();
     }
 
     @GET
@@ -84,12 +92,14 @@ public class OrderREST {
     public Response payForOrderById(@Context HttpServletRequest request, @PathParam("id") String restId) {
         Optional<User> user = Optional.ofNullable((User)request.getSession().getAttribute("user"));
         if (!user.isPresent()) {
-            return Response.status(403).entity("{error:forbidden}").build();
+            logger.debug("Unauthorized");
+            return Response.status(401).entity("{error:forbidden}").build();
         }
         Long id;
         try {
             id = Long.parseLong(restId);
         } catch (NumberFormatException e) {
+            logger.error("Bad order number");
             return Response.status(400).entity("{\"result\":\"bad\"}").build();
         }
         Optional<Order> order = DAOFactory.getOrderDAO().getOrder(id);
@@ -111,11 +121,12 @@ public class OrderREST {
     @Path("add")
     public Response placeOrder(@Context HttpServletRequest request) {
         if (!Optional.ofNullable(request.getSession().getAttribute("user")).isPresent()) {
-            return Response.status(403).entity("error:forbidden").build();
+            logger.debug("Unauthorized");
+            return Response.status(401).entity("error:forbidden").build();
         }
         List<Subscription> subscriptions = new ArrayList<>();
         try {
-            JSONObject jsonRequest = ((JSONObject) new JSONParser().parse(Common.getRequestBody(request)));
+            JSONObject jsonRequest = ((JSONObject) new JSONParser().parse(RequestService.getRequestBody(request)));
             String address = new String(((String) jsonRequest.get("address")).getBytes("ISO-8859-1"), "UTF-8");
             Long userId = ((User) request.getSession().getAttribute("user")).getId();
             DAOFactory.getOrderDAO().addOrder(new Order(userId,
@@ -142,7 +153,7 @@ public class OrderREST {
             });
             order.get().setToPay(price[0]);
             if (!DAOFactory.getOrderDAO().updateOrder(order.get())) {
-                throw new Exception("cannot");
+                throw new Exception("cannot place order");
             }
             JSONObject jsonResponse = new JSONObject();
             jsonResponse.put("id", order.get().getId());
@@ -151,6 +162,7 @@ public class OrderREST {
             return Response.ok().entity(jsonResponse.toJSONString()).build();
         }
         catch (Exception e) {
+            logger.error(e.getMessage());
             return Response.status(400).build();
         }
     }

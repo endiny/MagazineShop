@@ -11,6 +11,12 @@ public class Magazine {
     private Double price;
     private String description;
 
+    public Magazine(String name, Double price, String description) {
+        this.name = name;
+        this.price = price;
+        this.description = description;
+    }
+
     public Magazine(Long id, String name, Double price, String description) {
         this.id = id;
         this.name = name;

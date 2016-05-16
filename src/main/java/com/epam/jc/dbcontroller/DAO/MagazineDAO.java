@@ -3,6 +3,8 @@ package com.epam.jc.DbController.DAO;
 import com.epam.jc.DbController.ConnectionPool.ConnectionPool;
 import com.epam.jc.DbController.ConnectionPool.PooledConnection;
 import com.epam.jc.DbController.Entities.Magazine;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -18,6 +20,7 @@ import java.util.Optional;
  * @author Vladislav Boboshko
  */
 public class MagazineDAO {
+    private final static Logger logger = LogManager.getLogger(MagazineDAO.class.getName());
     private MagazineDAO() {}
     private static MagazineDAO instance;
     public static MagazineDAO getInstance() {
@@ -36,7 +39,7 @@ public class MagazineDAO {
             return (st.executeUpdate() != 0);
         }
         catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Unable to add magazine");
             return false;
         }
     }
@@ -55,7 +58,7 @@ public class MagazineDAO {
             return (st.executeUpdate() != 0);
         }
         catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Unable to update magazine");
             return false;
         }
     }
@@ -77,7 +80,7 @@ public class MagazineDAO {
                     result.getString("description")));
         }
         catch (SQLException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
             return Optional.empty();
         }
     }
@@ -100,7 +103,7 @@ public class MagazineDAO {
             return magazines;
         }
         catch (SQLException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
             return Collections.emptyList();
         }
     }
@@ -115,7 +118,7 @@ public class MagazineDAO {
             return (st.executeUpdate() != 0);
         }
         catch (SQLException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
             return false;
         }
     }

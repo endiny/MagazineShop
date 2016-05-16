@@ -4,6 +4,8 @@ import com.epam.jc.DbController.ConnectionPool.ConnectionPool;
 import com.epam.jc.DbController.ConnectionPool.PooledConnection;
 import com.epam.jc.DbController.Entities.Order;
 import com.epam.jc.DbController.Entities.Subscription;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -20,6 +22,7 @@ import java.util.Optional;
  * @author Vladislav Boboshko
  */
 public class SubscriptionDAO {
+    private static final Logger logger = LogManager.getLogger(SubscriptionDAO.class.getName());
     private SubscriptionDAO() {
         connectionPool = ConnectionPool.getInstance();
     }
@@ -42,7 +45,7 @@ public class SubscriptionDAO {
             return (st.executeUpdate() != 0);
         }
         catch (SQLException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
             return false;
         }
     }
@@ -69,7 +72,7 @@ public class SubscriptionDAO {
             return subscriptions;
         }
         catch (SQLException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
             return Collections.emptyList();
         }
     }
@@ -92,7 +95,7 @@ public class SubscriptionDAO {
                     resultSet.getLong("months")));
         }
         catch (SQLException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
             return Optional.empty();
         }
     }
@@ -108,7 +111,7 @@ public class SubscriptionDAO {
             return (st.executeUpdate() != 0);
         }
         catch (SQLException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
             return false;
         }
     }
@@ -141,7 +144,7 @@ public class SubscriptionDAO {
             return (st.executeUpdate() != 0);
         }
         catch (SQLException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
             return false;
         }
     }
