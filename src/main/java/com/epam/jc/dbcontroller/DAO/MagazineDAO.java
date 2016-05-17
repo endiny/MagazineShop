@@ -90,7 +90,7 @@ public class MagazineDAO {
         List<Magazine> magazines = new ArrayList<>();
         try (PooledConnection conn = PooledConnection.wrap(instance.takeConnection(),
                 instance.getFreeConnections(), instance.getReservedConnections())) {
-            String sql = "SELECT * FROM magazines";
+            String sql = "SELECT * FROM magazines ORDER BY id DESC";
             PreparedStatement st = conn.prepareStatement(sql);
             ResultSet result = st.executeQuery();
             while (result.next()) {
@@ -125,5 +125,26 @@ public class MagazineDAO {
 
     public boolean deleteMagazine(Magazine magazine) {
         return deleteMagazine(magazine.getId());
+    }
+    public Optional<Magazine> getLatest() {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        try (PooledConnection conn = PooledConnection.wrap(connectionPool.takeConnection(),
+                connectionPool.getFreeConnections(), connectionPool.getReservedConnections())) {
+            String sql = "SELECT * FROM magazines ORDER BY id DESC LIMIT 1;";
+            PreparedStatement st = conn.prepareStatement(sql);
+            ResultSet result = st.executeQuery();
+            if (!result.next()) {
+                throw new SQLException("No magazine is available.");
+            }
+            return Optional.of(new Magazine(
+                    result.getLong("id"),
+                    result.getString("name"),
+                    result.getDouble("price"),
+                    result.getString("description")));
+        }
+        catch (SQLException e) {
+            logger.error(e.getMessage());
+            return Optional.empty();
+        }
     }
 }

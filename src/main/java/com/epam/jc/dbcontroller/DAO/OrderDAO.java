@@ -108,7 +108,7 @@ public class OrderDAO {
         List<Order> orders = new ArrayList<>();
         try (PooledConnection conn = PooledConnection.wrap(connectionPool.takeConnection(),
                 connectionPool.getFreeConnections(), connectionPool.getReservedConnections())) {
-            String sql = "SELECT * FROM orders WHERE user_id=(?)";
+            String sql = "SELECT * FROM orders WHERE user_id=(?) ORDER BY id DESC";
             PreparedStatement st = conn.prepareStatement(sql);
             st.setLong(1, userId);
             ResultSet resultSet = st.executeQuery();

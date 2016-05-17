@@ -80,7 +80,7 @@ public class MagazineInfo {
     }
 
     @GET
-    @Path("id/{magazineId}/delete")
+    @Path("delete/{magazineId}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response deleteMagazine(@Context HttpServletRequest requestContext, @PathParam("magazineId") String sId) {
         if (!LoginDispatcher.getInstance().isUserInRole(requestContext.getSession(), "admin")) {
@@ -95,15 +95,16 @@ public class MagazineInfo {
         catch (NumberFormatException e) {
             return Response.status(400).build();
         }
-        jsonResponse.put("result", DAOFactory.getMagazineDAO().deleteMagazine(id));
-        return Response.ok().entity(jsonResponse.toJSONString()).build();
+        boolean result = DAOFactory.getMagazineDAO().deleteMagazine(id);
+        jsonResponse.put("result", result);
+        return Response.status(result?200:400).entity(jsonResponse.toJSONString()).build();
     }
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Path("add")
-    public Response deleteMagazine(@Context HttpServletRequest requestContext) {
+    public Response addMagazine(@Context HttpServletRequest requestContext) {
         if (!LoginDispatcher.getInstance().isUserInRole(requestContext.getSession(), "admin")) {
             return Response.status(403).entity("status:forbidden").build();
         }
@@ -115,8 +116,19 @@ public class MagazineInfo {
             Double price = Double.valueOf(((String) jsonRequest.get("price")));
             Magazine magazine = new Magazine(name, price, description);
             boolean result = DAOFactory.getMagazineDAO().addMagazine(magazine);
+            Optional<Magazine> latest = DAOFactory.getMagazineDAO().getLatest();
+            if (!latest.isPresent()) {
+                result = false;
+            }
             jsonResponse.put("result", result);
             if (result) {
+                Magazine magazine1 = latest.get();
+                JSONObject jsonMagazine = new JSONObject();
+                jsonMagazine.put("id", magazine1.getId());
+                jsonMagazine.put("name", magazine1.getName());
+                jsonMagazine.put("description", magazine1.getDescription());
+                jsonMagazine.put("price", magazine1.getPrice());
+                jsonResponse.put("magazine", jsonMagazine);
                 logger.debug("Magazine was added");
                 return Response.ok().entity(jsonResponse.toJSONString()).build();
             } else {
@@ -127,5 +139,50 @@ public class MagazineInfo {
             logger.error(e.getMessage());
             return Response.status(400).entity(jsonResponse.toJSONString()).build();
         }
+    }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("edit")
+    public Response updateMagazine(@Context HttpServletRequest requestContext) {
+        if (!LoginDispatcher.getInstance().isUserInRole(requestContext.getSession(), "admin")) {
+            return Response.status(403).entity("status:forbidden").build();
+        }
+        JSONObject jsonResponse = new JSONObject();
+        try {
+            JSONObject jsonRequest = (JSONObject) new JSONParser().parse(RequestService.getRequestBody(requestContext));
+            Long id = ((Long) jsonRequest.get("id"));
+            Optional<Magazine> magazineOptional = DAOFactory.getMagazineDAO().getMagazine(id);
+            if (!magazineOptional.isPresent()) {
+                throw new Exception("No such magazine with id #" + id);
+            }
+            String name = new String(((String) jsonRequest.get("name")).getBytes("ISO-8859-1"), "UTF-8");
+            String description = new String(((String) jsonRequest.get("description")).getBytes("ISO-8859-1"), "UTF-8");
+            Double price = Double.valueOf(((String) jsonRequest.get("price")));
+            Magazine magazine = magazineOptional.get();
+            magazine.setName(name);
+            magazine.setDescription(description);
+            magazine.setPrice(price);
+            boolean result = DAOFactory.getMagazineDAO().updateMagazine(magazine);
+            jsonResponse.put("result", result);
+            if (result) {
+                JSONObject jsonMagazine = new JSONObject();
+                jsonMagazine.put("id", magazine.getId());
+                jsonMagazine.put("name", magazine.getName());
+                jsonMagazine.put("description", magazine.getDescription());
+                jsonMagazine.put("price", magazine.getPrice());
+                jsonResponse.put("magazine", jsonMagazine);
+                logger.debug("Magazine was updated");
+                return Response.ok().entity(jsonResponse.toJSONString()).build();
+            } else {
+                throw new Exception("Unable to add magazine");
+            }
+        }
+        catch (Exception e) {
+            logger.error(e.getMessage());
+            return Response.status(400).entity(jsonResponse.toJSONString()).build();
+        }
+
     }
 }
