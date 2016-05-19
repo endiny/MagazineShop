@@ -16,14 +16,15 @@ import java.util.Optional;
  *
  * @author Vladislav Boboshko
  */
+@Path("alive")
 public class SessionCheck {
 
-    @Path("alive")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response isAlive(@Context HttpServletRequest request) {
         JSONObject jsonResponse = new JSONObject();
-        jsonResponse.put("alive", Optional.ofNullable(request.getSession().getAttribute("user")).isPresent());
-        return Response.ok().entity(jsonResponse.toJSONString()).build();
+        boolean result = Optional.ofNullable(request.getSession().getAttribute("user")).isPresent();
+        jsonResponse.put("alive", result);
+        return Response.status(result?200:401).entity(jsonResponse.toJSONString()).build();
     }
 }
