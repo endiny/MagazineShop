@@ -15,4 +15,5 @@ gen/
 .gradletasknamecache
 .gradle/
 build/
+out/
 classes
